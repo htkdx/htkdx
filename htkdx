@@ -1,0 +1,217 @@
+http://www.htkdx.com/api/doc
+
+
+
+  
+接口说明 短信 / 彩信 / 错误说明
+
+1. 发送短信
+
+访问地址：	
+http://5114-97c73.sms-api.63810.com/api/SmsSend/user/fafaip/hash/c128d88715ffde20cd0d11fe75cb2168/encode/编码/smstype/短信类型?mobile=手机号码&content=短信内容
+
+或者以下这个访问地址：
+
+http://5114-97c73.sms-api.63810.com/api/sms_send?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168&encode=编码&smstype=短信类型&mobile=手机号码&content=短信内容&time=定时(格式如2012-10-8 17:00:53)
+特别说明	这是您的唯一接口访问地址，请不要转发给其它人，修改后密码后hash会变，您可以重新上来拷贝。如果您担心接口被盗用，可绑定IP来限制其它非授权IP使用，具体在 帐户信息的IP绑定里设置。
+编码	可传 gb2312 gbk utf-8 这些类参数, 根据您当前的编码方式来定。
+短信类型	可传 notify 或 ad , adcard，adfangchan,dxztd 五参数， notify: 表示通知类， ad: 表示106通道广告类，adcard: 表示卡发通道广告类, adfangchan:表示106房产专用通道，dxztd:表示低限制通道， 严禁用通知类发广告，否则将关掉api接口同时封帐号不退余额，严重的提交相关部门处理。
+手机号码	多个手机号请使用 "小写的逗号" 隔开， 如果手机号太多时请使用POST方式提交，不要使用GET方式 ， 相同内容的短信，请一次性发送，不要分成多次，以免帐号被封。
+返回数据说明：	我们返回的数据是一个JSON格式的数据，发送成功时会是像这样的数据返回：{"result":true,"msg":null,"active":0,"errcode":0,"msg_id":77985} 
+result=true 表示发送成功; active=0 表示需要我们人工审核，active=2 表示已经自动审核通过; 当发送失败时， msg这里会有对应的中文说明; msg_id 是我们系统的一个订单号，如果需要接收失败通知时会把这个msg_id返回到你的平台上来。
+2. 接收短信及接收失败通知
+
+访问地址：	你们的地址?type=上行类型&mobile=手机号&msg=短信内容&msg_id=消息ID
+你们的地址	在"帐户管理"的"接口设置"里设置，比如是 http://wwww.abc.com/dx.asp
+上行类型	0上行短信，1状态报告
+短信类型	可传 notify 或 ad , adcard，adfangchan,dxztd 五参数， notify: 表示通知类， ad: 表示106通道广告类，adcard: 表示卡发通道广告类, adfangchan:表示106房产专用通道，dxztd:表示低限制通道， 严禁用通知类发广告，否则将关掉api接口同时封帐号不退余额，严重的提交相关部门处理。
+短信内容	UTF-8编码，如果您是GBK编码请记得转码，需要注意的是，当类型为状态报告时， 短信内容如果是 UNSEND 时， 表示发送失败！
+消息ID	在通过api接口发送成功时，我们有返回json格式的数据里，有一个msg_id.
+说明：	这里的消息返回模式是我们主动通知模式，您如果希望使用您主动上来获取的模式可以使用如下接口，我们将返回最近未获取的数据：
+http://5114-97c73.sms-api.63810.com/api/get?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168
+3. 查询帐户余额
+
+访问地址：	http://5114-97c73.sms-api.63810.com/api/get_info?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168
+相关说明	返回内容为utf-8编码, Json格式的数据，其中amount后面的数字就是您当前帐户余额！
+4. 查询短信状态
+
+访问地址：	http://5114-97c73.sms-api.63810.com/api/sms_status?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168&msg_ids=消息ID（如果查询多个请用“,”分割，比如123,234）
+相关说明	返回内容为utf-8编码, Json格式的数据
+5. 发送彩信
+
+实例下载：	JAVA版本 PHP版本
+访问地址：	http://5114-97c73.sms-api.63810.com/api/mmsSend?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168
+请求方式	只Post方式。
+参数名	描述
+subject	彩信标题，非空，长度不能超过30个字符，超出返回失败信息。
+mobile	接收号码，多个用逗号隔开，非空。eg：13900000000,13300000000
+msg	彩信内容，非空。
+格式要求：
+最多设置10帧。
+每个彩信资源用分号(;)分隔，每个资源信息用逗号(,)分隔。
+每帧文件有三部分组成：文本(TEXT)、图片(GIF、JPG)、声音，每帧中最多可设置这三种形式的媒体文件，也可以设置三种文件中的一种或者两种。
+eg：1,TEXT,zsSxvg==;1,JPG,4AAQSkZJRgABAgAAZABk;2,....
+演示代码 - PHP版
+
+发送短信	
+$mobile = "13600000000,18600000000"; // 多个号码可用逗号分隔,最多200个
+$content = "test"; // string 不建议太长
+$encode = "gb2312"; // 可选参数
+//可传 notify 或 ad , adcard，adfangchan,dxztd 五参数，  notify: 表示通知类， ad: 表示106通道广告类，
+adcard: 表示卡发通道广告类, adfangchan:表示106房产专用通道，dxztd:表示低限制通道， 
+// 严禁用通知类发广告，否则将关掉api接口同时封帐号不退余额，严重的提交相关部门处理。
+$smstype = 'ad'; 
+$url= "http://5114-97c73.sms-api.63810.com/api/sms_send?";
+$url.= "user=fafaip&";
+$url.= "hash=c128d88715ffde20cd0d11fe75cb2168&";
+$url.= "encode=$encode&";
+$url.= "smstype=$smstype&";
+$url.= "mobile=".urlencode($mobile)."&content=".urlencode($content)."";
+
+$ctx = stream_context_create(array( 
+    'http' => array( 
+        'timeout' => 30,
+	'header' => "User-Agent:Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1;YNSMS API v1.0;)"
+        ) 
+    ) 
+); 
+
+$r = file_get_contents($url, 0, $ctx);
+$rs = json_decode($r, true);
+
+if ( !$rs['result'] ) {
+    echo "失败原因：错误代码:".$rs['errcode'].',中文：'.$rs['msg'];
+    //file_put_contents ('./sms_log.txt',"短信发送失败：失败原因：错误代码".$rs['errcode'].',中文：'.$rs['msg'],FILE_APPEND);
+}else{
+    echo "发送成功了！";
+}
+                
+查获短信	
+$url = "http://5114-97c73.sms-api.63810.com/api/get?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168";
+// 返回内容为utf-8编码
+echo $r = file_get_contents($url);
+                
+查询余额	
+$url = "http://5114-97c73.sms-api.63810.com/api/get_info?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168";
+// 返回内容为utf-8编码
+echo $r = file_get_contents($url);
+注意：这里只返回未读的
+                
+演示代码 - java
+
+import java.io.UnsupportedEncodingException;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.PostMethod;
+
+public class SendMsg {
+
+	public static void main(String[] args)throws Exception
+	{
+		HttpClient client = new HttpClient();
+		PostMethod post = new PostMethod("http://5114-97c73.sms-api.63810.com/api/sms_send"); 
+		//在头文件中设置转码
+		post.addRequestHeader("Content-Type","application/x-www-form-urlencoded;charset=UTF-8");
+		NameValuePair[] data ={ new NameValuePair("user", "fafaip"),
+		new NameValuePair("hash", "c128d88715ffde20cd0d11fe75cb2168"),
+		new NameValuePair("mobile", "手机号码"),
+		new NameValuePair("content","短信内容"),
+		new NameValuePair("encode","UTF-8"),
+		new NameValuePair("smstype","短信类型")};
+		post.setRequestBody(data);
+		
+		client.executeMethod(post);
+		Header[] headers = post.getResponseHeaders();
+		int statusCode = post.getStatusCode();
+		System.out.println("statusCode:"+statusCode);
+		for(Header h : headers)
+		{
+			System.out.println(h.toString());
+		}
+		String result = new String(post.getResponseBodyAsString().getBytes("UTF-8")); 
+		System.out.println(result);
+		
+		
+		post.releaseConnection();
+	}
+
+}
+                
+演示代码 - c#
+
+//需要用到的命名空间
+using System.Net;
+using System.IO;
+using System.Text;
+//调用时只需要把拼成的URL传给该函数即可。判断返回值即可
+public string GetHtmlFromUrl(string url)
+{
+string strRet = null;
+if(url==null || url.Trim().ToString()=="")
+{
+return strRet;
+}
+string targeturl = url.Trim().ToString();
+try
+{
+HttpWebRequest hr = (HttpWebRequest)WebRequest.Create(targeturl);
+hr.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)";
+hr.Method = "GET";
+hr.Timeout = 30 * 60 * 1000;
+WebResponse hs = hr.GetResponse();
+Stream sr = hs.GetResponseStream();
+StreamReader ser = new StreamReader(sr, Encoding.Default);
+strRet = ser.ReadToEnd(); 
+}
+catch (Exception ex)
+{
+strRet = null;
+}
+return strRet;
+}
+                
+演示代码 - ASP版
+
+发送短信	
+'常用函数
+'输入url目标网页地址，返回值getHTTPPage是目标网页的html代码
+function getHTTPPage(url)
+dim Http
+set Http=server.createobject("MSXML2.XMLHTTP")
+Http.open "GET",url,false
+Http.send()
+if Http.readystate<>4 then 
+exit function
+end if
+getHTTPPage=bytesToBSTR(Http.responseBody,"GB2312")
+set http=nothing
+if err.number<>0 then err.Clear 
+end function
+Function BytesToBstr(body,Cset)
+dim objstream
+set objstream = Server.CreateObject("adodb.stream")
+objstream.Type = 1
+objstream.Mode =3
+objstream.Open
+objstream.Write body
+objstream.Position = 0
+objstream.Type = 2
+objstream.Charset = Cset
+BytesToBstr = objstream.ReadText 
+objstream.Close
+set objstream = nothing
+End Function
+
+'自已组合一下提交的URL加入自己的账号
+sms_url="http://5114-97c73.sms-api.63810.com/api/sms_send?user=fafaip&hash=c128d88715ffde20cd0d11fe75cb2168&encode=编码
+&smstype=短信类型&mobile=手机号码&content=短信内容"response.write getHTTPPage(sms_url)
+
+'短信类型：
+'可传 notify 或 ad , adcard，adfangchan,dxztd 五参数，  notify: 表示通知类， ad: 表示106通道广告类，
+adcard: 表示卡发通道广告类, adfangchan:表示106房产专用通道，dxztd:表示低限制通道， 
+'严禁用通知类发广告，否则将关掉api接口同时封帐号不退余额，严重的提交相关部门处理。
+
+'编码：
+'可传 gb2312 gbk utf-8 这些类参数
+                
